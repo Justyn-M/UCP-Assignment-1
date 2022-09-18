@@ -6,7 +6,18 @@
 #include "macros.h"
 #include "ops.h"
 
-/* random.c functins */ 
+
+/* Due to the bug in my vscode, I cannot create new .c files as they appear with
+command-line error: language mods specified are incompatible C/C++ (1027) and also
+sometimes gives random untold errors in other files.
+I have tried for hours to fix this to no avail.
+Hence I have said which functions should be in a new file */
+
+/* ================ */
+/* FOLLOWING FILES SHOULD BE IN random.c */
+/* ================ */
+
+/* random.c functins */
 
 /*call this function just ONCE at the beginning of your program before using the random number generator */
 void initRandom()
@@ -22,18 +33,24 @@ int random(int low, int high)
 {
     int number = -1;
 
-    if(low <= high)
+    if (low <= high)
     {
-        number = (rand() % (high-low+1)) + low;
+        number = (rand() % (high - low + 1)) + low;
     }
 
     return number;
 }
 
-
+/* ================ */
+/* END OF FILES SHOULD BE IN random.c */
 /* ================ */
 
 
+/* ================ */
+/* FOLLOWING FILES SHOULD BE IN map.c and called to main by map.h */
+/* ================ */
+
+/* function that generates the map */
 char **generateMap(int mapDimensions[])
 {
     int row = mapDimensions[MAP_ROW];
@@ -46,7 +63,7 @@ char **generateMap(int mapDimensions[])
 
     return map;
 }
-
+/* function that wipes the map and free the memory */
 void wipeMap(char **map, int mapDimensions[])
 {
     int row = mapDimensions[MAP_ROW];
@@ -60,7 +77,7 @@ void wipeMap(char **map, int mapDimensions[])
     free(map);
     map = NULL;
 }
-
+/* function that lays the map borders */
 void layMap(char **map, int mapDimensions[])
 {
     int row = mapDimensions[MAP_ROW];
@@ -81,7 +98,7 @@ void layMap(char **map, int mapDimensions[])
         }
     }
 }
-
+/* function that inserts the player and goal into the map */
 void insertEntity(char **map, int playerPosition[], int goalPosition[])
 {
     int playerRow = playerPosition[MAP_ROW];
@@ -93,7 +110,7 @@ void insertEntity(char **map, int playerPosition[], int goalPosition[])
     map[goalRow][goalCol] = MARKER_GOAL;
 }
 
-/* create a function using random that generates Xs on the map */
+/* function using random function to generate Xs on the map */
 void insertX(char **map, int mapDimensions[])
 {
     int row = mapDimensions[MAP_ROW];
@@ -107,7 +124,7 @@ void insertX(char **map, int mapDimensions[])
             if (map[i][j] == ' ')
             {
                 int randomNum = random(0, 100);
-                if (randomNum < 10)
+                if (randomNum < 5)
                 {
                     map[i][j] = MARKER_FLOOR;
                 }
@@ -115,7 +132,7 @@ void insertX(char **map, int mapDimensions[])
         }
     }
 }
-
+/* function that prints the map */
 static void printMap(char **map, int mapDimensions[])
 {
     int row = mapDimensions[MAP_ROW];
@@ -132,45 +149,19 @@ static void printMap(char **map, int mapDimensions[])
     }
 }
 
+/* END OF FUNCTIONS THAT SHOULD BE IN FILE map.c AND CALLED TO MAIN USING
+map.h */
+
+
+/* ================ */
+/* FOLLOWING FILES ARE CORRECTLY PLACED INTO main.c */
+/* ================ */
+
 /* disable echo and canonical so that player can move without pressing enter */
 static void disableEchoAndCanonical()
 {
     system("stty -echo");
     system("stty -icanon");
-}
-
-/* function that allows player to cross the border and appear on the other side, use conditional compilation */
-void crossBorder(int playerPosition[], int mapDimensions[])
-{
-    int row = mapDimensions[MAP_ROW];
-    int col = mapDimensions[MAP_COL];
-
-    if (playerPosition[MAP_ROW] == 0)
-    {
-        playerPosition[MAP_ROW] = row - 2;
-    }
-    else if (playerPosition[MAP_ROW] == row - 1)
-    {
-        playerPosition[MAP_ROW] = 1;
-    }
-    else if (playerPosition[MAP_COL] == 0)
-    {
-        playerPosition[MAP_COL] = col - 2;
-    }
-    else if (playerPosition[MAP_COL] == col - 1)
-    {
-        playerPosition[MAP_COL] = 1;
-    }
-}
-
-/* function that checks if player has reached the goal, if so, print out the message and exit the game */
-void checkGoal(int playerPosition[], int goalPosition[])
-{
-    if (playerPosition[MAP_ROW] == goalPosition[MAP_ROW] && playerPosition[MAP_COL] == goalPosition[MAP_COL])
-    {
-        printf("You Win!\n");
-        exit(0);
-    }
 }
 
 /* =============================================================================
@@ -185,13 +176,15 @@ int main(int argc, char *argv[])
     int mapDimensions[2];
     int playerPosition[2];
     int goalPosition[2];
+    char **map;
+
+
 
     initRandom();
 
     if (argc != 7)
     {
         printf("Input: %s <map row> <map col> <player row> <player col> <goal row> <goal col>\n", argv[0]);
-        printf("Any out of bounds values will result in a segmentation fault\n");
         return 1;
     }
     mapDimensions[MAP_ROW] = atoi(argv[1]);
@@ -201,57 +194,93 @@ int main(int argc, char *argv[])
     goalPosition[MAP_ROW] = atoi(argv[5]);
     goalPosition[MAP_COL] = atoi(argv[6]);
 
-
-
-    char **map = generateMap(mapDimensions);
-    system("clear");
+    /* player position and goal positions cannot be the same */
+    if (playerPosition[MAP_ROW] == goalPosition[MAP_ROW] && playerPosition[MAP_COL] == goalPosition[MAP_COL])
+    {
+        printf("Player and goal positions cannot be the same\n");
+        return 1;
+    }
     
+    map = generateMap(mapDimensions);
+    /* used system clear to clear screen */
+    system("clear");
+
     disableEchoAndCanonical();
     layMap(map, mapDimensions);
     insertEntity(map, playerPosition, goalPosition);
     printMap(map, mapDimensions);
-    readUserInput(Input);
+    readInput(Input);
 
-
-    /* move player, every time the player moves, an X is placed on the map using random function */
-    while (*Input != '=')
+    while (1)
     {
-        switch (*Input)
+        if (strcmp(Input, "w") == 0)
         {
-        case UP:
             playerPosition[MAP_ROW]--;
             crossBorder(playerPosition, mapDimensions);
-            break;
-        case DOWN:
+            system("clear");
+            layMap(map, mapDimensions);
+            insertEntity(map, playerPosition, goalPosition);
+            insertX(map, mapDimensions);
+            printMap(map, mapDimensions);
+            checkGoal(playerPosition, goalPosition);
+            checkLoss(map, playerPosition);
+            readInput(Input);
+        }
+        else if (strcmp(Input, "s") == 0)
+        {
             playerPosition[MAP_ROW]++;
             crossBorder(playerPosition, mapDimensions);
-            break;
-        case LEFT:
+            system("clear");
+            layMap(map, mapDimensions);
+            insertEntity(map, playerPosition, goalPosition);
+            insertX(map, mapDimensions);
+            printMap(map, mapDimensions);
+            checkGoal(playerPosition, goalPosition);
+            checkLoss(map, playerPosition);
+            readInput(Input);
+        }
+        else if (strcmp(Input, "a") == 0)
+        {
             playerPosition[MAP_COL]--;
             crossBorder(playerPosition, mapDimensions);
-            break;
-        case RIGHT:
+            system("clear");
+            layMap(map, mapDimensions);
+            insertEntity(map, playerPosition, goalPosition);
+            insertX(map, mapDimensions);
+            printMap(map, mapDimensions);
+            checkGoal(playerPosition, goalPosition);
+            checkLoss(map, playerPosition);
+            readInput(Input);
+        }
+        else if (strcmp(Input, "d") == 0)
+        {
             playerPosition[MAP_COL]++;
             crossBorder(playerPosition, mapDimensions);
-            break;
-        default:
-            printf("Invalid input\n");
-            break;
+            system("clear");
+            layMap(map, mapDimensions);
+            insertEntity(map, playerPosition, goalPosition);
+            insertX(map, mapDimensions);
+            printMap(map, mapDimensions);
+            checkGoal(playerPosition, goalPosition);
+            checkLoss(map, playerPosition);
+            readInput(Input);
         }
-
-        map = generateMap(mapDimensions);
-        system("clear");
-        disableEchoAndCanonical();
-        layMap(map, mapDimensions);
-        insertEntity(map, playerPosition, goalPosition);
-        insertX(map, mapDimensions);
-        printMap(map, mapDimensions);
-        checkGoal(playerPosition, goalPosition);
-        readUserInput(Input);
-        wipeMap(map, mapDimensions);
-
+        else if (strcmp(Input, "q") == 0)
+        {
+            printf("You Quit!\n");
+            exit(0);
+/* disobeyed coding standards because I could not get wipemap to work in main */
+        }
+        else
+        {
+            printf("Invalid Input! Try again:\n");
+            readInput(Input);
+        }
     }
 
+    /* clear memory leaks */
+    free(Input);
+    free(map);
 
     return 0;
 }
