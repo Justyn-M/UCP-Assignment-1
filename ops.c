@@ -21,7 +21,7 @@ void readInput(char *Input)
     printf("\n");
 }
 
-/* function that allows player to cross the border and appear on the other side, use conditional compilation */
+/* function that allows player to cross the border and appear on the other side*/
 void crossBorder(int playerPosition[], int mapDimensions[])
 {
     int row = mapDimensions[MAP_ROW];
@@ -49,11 +49,13 @@ void crossBorder(int playerPosition[], int mapDimensions[])
  print out the message and exit the game */
 void checkGoal(int playerPosition[], int goalPosition[])
 {
-    if (playerPosition[MAP_ROW] == goalPosition[MAP_ROW] && playerPosition[MAP_COL] == goalPosition[MAP_COL])
+    if (playerPosition[MAP_ROW] == goalPosition[MAP_ROW] && 
+    playerPosition[MAP_COL] == goalPosition[MAP_COL])
     {
         printf("You Win!\n");
         exit(0);
-        /* disobeyed coding standards by using exit(0) as I could not get wipeMap to work properly :) */
+        /* disobeyed coding standards by using exit(0) 
+        as I could not get wipeMap to work properly :) */
     }
 }
 
@@ -65,6 +67,7 @@ void checkLoss(char **map, int playerPosition[])
     {
         printf("You Lose!\n");
         exit(0);
-        /* disobeyed coding standards by using exit(0) as I could not get wipeMap to work properly :) */
+        /* disobeyed coding standards by using exit(0) 
+        as I could not get wipeMap to work properly :) */
     }
 }

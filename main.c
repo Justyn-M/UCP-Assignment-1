@@ -1,3 +1,7 @@
+/*
+   main.c - main file for running the game
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +9,6 @@
 
 #include "macros.h"
 #include "ops.h"
-
 
 /* Due to the bug in my vscode, I cannot create new .c files as they appear with
 command-line error: language mods specified are incompatible C/C++ (1027) and also
@@ -44,7 +47,6 @@ int random(int low, int high)
 /* ================ */
 /* END OF FILES SHOULD BE IN random.c */
 /* ================ */
-
 
 /* ================ */
 /* FOLLOWING FILES SHOULD BE IN map.c and called to main by map.h */
@@ -152,7 +154,6 @@ static void printMap(char **map, int mapDimensions[])
 /* END OF FUNCTIONS THAT SHOULD BE IN FILE map.c AND CALLED TO MAIN USING
 map.h */
 
-
 /* ================ */
 /* FOLLOWING FILES ARE CORRECTLY PLACED INTO main.c */
 /* ================ */
@@ -178,8 +179,6 @@ int main(int argc, char *argv[])
     int goalPosition[2];
     char **map;
 
-
-
     initRandom();
 
     if (argc != 7)
@@ -200,7 +199,8 @@ int main(int argc, char *argv[])
         printf("Player and goal positions cannot be the same\n");
         return 1;
     }
-    
+
+
     map = generateMap(mapDimensions);
     /* used system clear to clear screen */
     system("clear");
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
         {
             printf("You Quit!\n");
             exit(0);
-/* disobeyed coding standards because I could not get wipemap to work in main */
+            /* disobeyed coding standards because I could not get wipemap to work in main */
         }
         else
         {
